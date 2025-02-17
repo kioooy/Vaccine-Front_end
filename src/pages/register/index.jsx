@@ -14,11 +14,11 @@ import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     email: "",
-    phoneNumber: "",
+    phone: "",
     address: "",
-    dateOfBirth: "",
+    dob: "",
     username: "",
     password: "",
     gender: "",
@@ -60,11 +60,11 @@ const RegisterPage = () => {
     let newErrors = { ...errors };
 
     switch (name) {
-      case "fullName":
-        if (!value) newErrors.fullName = "Full name is required";
+      case "name":
+        if (!value) newErrors.name = "Full name is required";
         else if (!/^[A-Za-z\s]+$/.test(value))
-          newErrors.fullName = "Only alphabets and spaces allowed";
-        else delete newErrors.fullName;
+          newErrors.name = "Only alphabets and spaces allowed";
+        else delete newErrors.name;
         break;
 
       case "email":
@@ -74,11 +74,11 @@ const RegisterPage = () => {
         else delete newErrors.email;
         break;
 
-      case "phoneNumber":
-        if (!value) newErrors.phoneNumber = "Phone number is required";
+      case "phone":
+        if (!value) newErrors.phone = "Phone number is required";
         else if (!/^[0-9]{10,15}$/.test(value))
-          newErrors.phoneNumber = "Invalid phone number format";
-        else delete newErrors.phoneNumber;
+          newErrors.phone = "Invalid phone number format";
+        else delete newErrors.phone;
         break;
 
       case "address":
@@ -88,11 +88,11 @@ const RegisterPage = () => {
         else delete newErrors.address;
         break;
 
-      case "dateOfBirth":
-        if (!value) newErrors.dateOfBirth = "Date of birth is required";
+      case "dob":
+        if (!value) newErrors.dob = "Date of birth is required";
         else if (new Date(value) > new Date())
-          newErrors.dateOfBirth = "Invalid date of birth";
-        else delete newErrors.dateOfBirth;
+          newErrors.dob = "Invalid date of birth";
+        else delete newErrors.dob;
         break;
 
       case "username":
@@ -143,7 +143,7 @@ const RegisterPage = () => {
     e.preventDefault();
 
     try {
-      const response = await api.post("register", formData);
+      const response = await api.post("authentication/register", formData);
       toast.success("Successfully created a new account!");
       navigate("/login");
     } catch (err) {
@@ -230,8 +230,9 @@ const RegisterPage = () => {
                     type="text"
                     value={formData.username}
                     onChange={handleChange}
-                    className={`appearance-none block w-full px-3 py-2 border ${errors.username ? "border-red-300" : "border-gray-300"
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                    className={`appearance-none block w-full px-3 py-2 border ${
+                      errors.username ? "border-red-300" : "border-gray-300"
+                    } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     placeholder="username123"
                   />
                   {errors.username && (
@@ -241,9 +242,7 @@ const RegisterPage = () => {
                   )}
                 </div>
                 {errors.username && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {errors.username}
-                  </p>
+                  <p className="mt-2 text-sm text-red-600">{errors.username}</p>
                 )}
               </div>
 
@@ -262,8 +261,9 @@ const RegisterPage = () => {
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
-                    className={`appearance-none block w-full px-3 py-2 border ${errors.password ? "border-red-300" : "border-gray-300"
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm pr-10`}
+                    className={`appearance-none block w-full px-3 py-2 border ${
+                      errors.password ? "border-red-300" : "border-gray-300"
+                    } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm pr-10`}
                     placeholder="••••••••"
                   />
                   <button
@@ -279,9 +279,7 @@ const RegisterPage = () => {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {errors.password}
-                  </p>
+                  <p className="mt-2 text-sm text-red-600">{errors.password}</p>
                 )}
                 {formData.password && ( // Chỉ hiển thị khi có giá trị trong trường mật khẩu
                   <div className="mt-2">
@@ -298,36 +296,34 @@ const RegisterPage = () => {
                 )}
               </div>
               <div className="space-y-4">
-
                 {/* Full Name */}
                 <div>
                   <label
-                    htmlFor="fullName"
+                    htmlFor="name"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Full Name
                   </label>
                   <div className="mt-1 relative">
                     <input
-                      id="fullName"
-                      name="fullName"
+                      id="name"
+                      name="name"
                       type="text"
-                      value={formData.fullName}
+                      value={formData.name}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${errors.fullName ? "border-red-300" : "border-gray-300"
-                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${
+                        errors.name ? "border-red-300" : "border-gray-300"
+                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="John Doe"
                     />
-                    {errors.fullName && (
+                    {errors.name && (
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <FaTimesCircle className="h-5 w-5 text-red-500" />
                       </div>
                     )}
                   </div>
-                  {errors.fullName && (
-                    <p className="mt-2 text-sm text-red-600">
-                      {errors.fullName}
-                    </p>
+                  {errors.name && (
+                    <p className="mt-2 text-sm text-red-600">{errors.name}</p>
                   )}
                 </div>
 
@@ -346,8 +342,9 @@ const RegisterPage = () => {
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${errors.email ? "border-red-300" : "border-gray-300"
-                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${
+                        errors.email ? "border-red-300" : "border-gray-300"
+                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="you@example.com"
                     />
                     {errors.email && (
@@ -364,32 +361,31 @@ const RegisterPage = () => {
                 {/* Phone Number */}
                 <div>
                   <label
-                    htmlFor="phoneNumber"
+                    htmlFor="phone"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Phone Number
                   </label>
                   <div className="mt-1 relative">
                     <input
-                      id="phoneNumber"
-                      name="phoneNumber"
+                      id="phone"
+                      name="phone"
                       type="text"
-                      value={formData.phoneNumber}
+                      value={formData.phone}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${errors.phoneNumber ? "border-red-300" : "border-gray-300"
-                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${
+                        errors.phone ? "border-red-300" : "border-gray-300"
+                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="123-456-7890"
                     />
-                    {errors.phoneNumber && (
+                    {errors.phone && (
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <FaTimesCircle className="h-5 w-5 text-red-500" />
                       </div>
                     )}
                   </div>
-                  {errors.phoneNumber && (
-                    <p className="mt-2 text-sm text-red-600">
-                      {errors.phoneNumber}
-                    </p>
+                  {errors.phone && (
+                    <p className="mt-2 text-sm text-red-600">{errors.phone}</p>
                   )}
                 </div>
 
@@ -408,8 +404,9 @@ const RegisterPage = () => {
                       type="text"
                       value={formData.address}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${errors.address ? "border-red-300" : "border-gray-300"
-                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${
+                        errors.address ? "border-red-300" : "border-gray-300"
+                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="123 Main St, City, Country"
                     />
                     {errors.address && (
@@ -419,7 +416,9 @@ const RegisterPage = () => {
                     )}
                   </div>
                   {errors.address && (
-                    <p className="mt-2 text-sm text-red-600">{errors.address}</p>
+                    <p className="mt-2 text-sm text-red-600">
+                      {errors.address}
+                    </p>
                   )}
                 </div>
 
@@ -439,7 +438,10 @@ const RegisterPage = () => {
                         onChange={handleChange}
                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                       />
-                      <label htmlFor="gender-male" className="ml-2 text-sm text-gray-700">
+                      <label
+                        htmlFor="gender-male"
+                        className="ml-2 text-sm text-gray-700"
+                      >
                         Male
                       </label>
                     </div>
@@ -453,10 +455,12 @@ const RegisterPage = () => {
                         onChange={handleChange}
                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                       />
-                      <label htmlFor="gender-female" className="ml-2 text-sm text-gray-700">
+                      <label
+                        htmlFor="gender-female"
+                        className="ml-2 text-sm text-gray-700"
+                      >
                         Female
                       </label>
-
                     </div>
                   </div>
                   {errors.gender && (
@@ -467,35 +471,32 @@ const RegisterPage = () => {
                 {/* Date of Birth */}
                 <div>
                   <label
-                    htmlFor="dateOfBirth"
+                    htmlFor="dob"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Date of Birth
                   </label>
                   <div className="mt-1 relative">
                     <input
-                      id="dateOfBirth"
-                      name="dateOfBirth"
+                      id="dob"
+                      name="dob"
                       type="date"
-                      value={formData.dateOfBirth}
+                      value={formData.dob}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${errors.dateOfBirth ? "border-red-300" : "border-gray-300"
-                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${
+                        errors.dob ? "border-red-300" : "border-gray-300"
+                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     />
-                    {errors.dateOfBirth && (
+                    {errors.dob && (
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <FaTimesCircle className="h-5 w-5 text-red-500" />
                       </div>
                     )}
                   </div>
-                  {errors.dateOfBirth && (
-                    <p className="mt-2 text-sm text-red-600">
-                      {errors.dateOfBirth}
-                    </p>
+                  {errors.dob && (
+                    <p className="mt-2 text-sm text-red-600">{errors.dob}</p>
                   )}
                 </div>
-
-
 
                 {/* Terms and Conditions */}
                 <div className="flex items-center">
@@ -529,10 +530,11 @@ const RegisterPage = () => {
                 <button
                   type="submit"
                   disabled={isLoading || Object.keys(errors).length > 0}
-                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading || Object.keys(errors).length > 0
-                    ? "bg-indigo-400 cursor-not-allowed"
-                    : "bg-indigo-600 hover:bg-indigo-700"
-                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+                    isLoading || Object.keys(errors).length > 0
+                      ? "bg-indigo-400 cursor-not-allowed"
+                      : "bg-indigo-600 hover:bg-indigo-700"
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                 >
                   {isLoading ? (
                     <svg
