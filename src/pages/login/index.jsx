@@ -15,6 +15,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors = {};
@@ -53,10 +54,26 @@ const LoginPage = () => {
           navigate('/dashboard');
         } else if (response.data.role === 'CUSTOMER') {
           navigate('/');
+
+      try {
+        const response = await api.post("authentication/login", formData);
+        console.log(response.data);
+        const { token, role } = response.data.data;
+        localStorage.setItem("token", token);
+        toast.success("Successfully login!");
+        navigate("/register");
+
+        if (role === "ADMIN") {
+          navigate("/dashboard");
+        } else if (role === "USER") {
+          navigate("/");
         }
 
       } catch (err) {
         toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+      } finally {
+      } catch (err) {
+        toast.error(err.response.data);
       } finally {
         setIsLoading(false);
       }
@@ -79,7 +96,7 @@ const LoginPage = () => {
             className="mx-auto h-12 w-auto"
             src="https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
             alt="Logo"
-            style={{ width: 100, height: 100, borderRadius: '50%' }}
+            style={{ width: 100, height: 100, borderRadius: "50%" }}
           />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Đăng nhập vào tài khoản của bạn
