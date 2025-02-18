@@ -1,9 +1,9 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 import { FaEye, FaEyeSlash, FaLock, FaUser } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { storeTokens, axiosInstance } from '../../utils/auth';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -14,22 +14,22 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors = {};
     if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
+      newErrors.username = "Tên đăng nhập là bắt buộc";
     } else if (formData.username.trim().length < 3) {
-      newErrors.username = "Username must be at least 3 characters";
+      newErrors.username = "Tên đăng nhập phải có ít nhất 3 ký tự";
     } else if (formData.username.trim().length > 50) {
-      newErrors.username = "Username must not exceed 50 characters";
+      newErrors.username = "Tên đăng nhập không được vượt quá 50 ký tự";
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = "Mật khẩu là bắt buộc";
     } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+      newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự";
     }
 
     setErrors(newErrors);
@@ -41,22 +41,23 @@ const LoginPage = () => {
     if (validateForm()) {
       setIsLoading(true);
       
-      try{
-        const response = await api.post('login', formData)
-        const { token, role } = response.data.data
-        localStorage.setItem('token', token)
-        toast.success('Successfully login!')
-        navigate('/register')
+      try {
+        const response = await axiosInstance.post('/login', formData);
+        const { accessToken, refreshToken } = response.data;
+        storeTokens(accessToken, refreshToken);
+        toast.success('Đăng nhập thành công!');
         
-        if(role === 'ADMIN'){
-          navigate('/dashboard')
-        }else if(role === 'CUSTOMER'){
-          navigate('/')
+        navigate('/register');
+        
+        if (response.data.role === 'ADMIN') {
+          navigate('/dashboard');
+        } else if (response.data.role === 'CUSTOMER') {
+          navigate('/');
         }
 
-      }catch(err){
-        toast.error(err.response.data)
-      }finally{
+      } catch (err) {
+        toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+      } finally {
         setIsLoading(false);
       }
     }
@@ -81,7 +82,7 @@ const LoginPage = () => {
             style={{ width: 100, height: 100, borderRadius: '50%' }}
           />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Đăng nhập vào tài khoản của bạn
           </h2>
         </div>
 
@@ -89,7 +90,7 @@ const LoginPage = () => {
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label htmlFor="username" className="sr-only">
-                Username
+                Tên đăng nhập
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -104,7 +105,7 @@ const LoginPage = () => {
                   className={`appearance-none rounded-lg relative block w-full pl-10 pr-3 py-2 border ${
                     errors.username ? "border-red-300" : "border-gray-300"
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
-                  placeholder="Enter your username"
+                  placeholder="Nhập tên đăng nhập của bạn"
                   value={formData.username}
                   onChange={handleChange}
                   aria-invalid={errors.username ? "true" : "false"}
@@ -119,7 +120,7 @@ const LoginPage = () => {
 
             <div>
               <label htmlFor="password" className="sr-only">
-                Password
+                Mật khẩu
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -134,7 +135,7 @@ const LoginPage = () => {
                   className={`appearance-none rounded-lg relative block w-full pl-10 pr-10 py-2 border ${
                     errors.password ? "border-red-300" : "border-gray-300"
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
-                  placeholder="Enter your password"
+                  placeholder="Nhập mật khẩu của bạn"
                   value={formData.password}
                   onChange={handleChange}
                   aria-invalid={errors.password ? "true" : "false"}
@@ -143,7 +144,7 @@ const LoginPage = () => {
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu"}
                 >
                   {showPassword ? (
                     <FaEyeSlash className="h-5 w-5 text-gray-400" />
@@ -174,7 +175,7 @@ const LoginPage = () => {
                 htmlFor="remember-me"
                 className="ml-2 block text-sm text-gray-900"
               >
-                Remember me
+                Ghi nhớ tôi
               </label>
             </div>
 
@@ -183,7 +184,7 @@ const LoginPage = () => {
                 href="#"
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
-                Forgot your password?
+                Quên mật khẩu?
               </a>
             </div>
           </div>
@@ -192,7 +193,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               {isLoading ? (
                 <svg
@@ -216,16 +217,16 @@ const LoginPage = () => {
                   ></path>
                 </svg>
               ) : null}
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
 
             <p className="mt-4 text-center text-sm text-gray-600">
-              Don't have an account?{" "}
+              Bạn chưa có tài khoản?{" "}
               <a
                 href="/register"
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
-                Register here
+                Đăng ký tại đây
               </a>
             </p>
           </div>
@@ -236,7 +237,7 @@ const LoginPage = () => {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white text-gray-500">
-                Or continue with
+                Hoặc đăng nhập bằng
               </span>
             </div>
           </div>
@@ -248,7 +249,7 @@ const LoginPage = () => {
               onClick={() => console.log("Google sign in clicked")}
             >
               <FcGoogle className="h-5 w-5" />
-              Sign in with Google
+              Đăng nhập bằng Google
             </button>
           </div>
         </form>
