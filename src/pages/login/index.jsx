@@ -45,27 +45,32 @@ const LoginPage = () => {
 
       try {
         const response = await api.post("authentication/login", formData);
-        console.log(response.data);
-        const { token, role } = response.data.data;
+        console.log("Full API Response:", response); // In ra để kiểm tra dữ liệu trả về
+
+        if (!response || !response.data) {
+          throw new Error("Invalid response from server");
+        }
+        const { token, role } = response.data; // Không cần response.data.data
+
         localStorage.setItem("token", token);
         toast.success("Successfully login!");
-        navigate("/register");
 
-        if (role === "ADMIN") {
-          navigate("/dashboard");
-        } else if (role === "USER") {
-          navigate("/");
-        }
+        setTimeout(() => {
+          if (role === "ADMIN") {
+            navigate("/dashboard");
+          } else {
+            navigate("/");
+          }
+        }, 1500);
       } catch (err) {
-        setLoginError("Wrong Username or Password"); // Set login error message
+        console.error("Login error:", err);
+        toast.error(err.response?.data?.message || "Login failed");
       } finally {
         setIsLoading(false);
       }
-    } else {
-      toast.error("Please fill in the required fields.");
+
     }
   };
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -208,8 +213,8 @@ const LoginPage = () => {
               type="submit"
               disabled={isLoading || !isFormValid()}
               className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${isLoading || !isFormValid()
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
                 } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
             >
               {isLoading ? (
