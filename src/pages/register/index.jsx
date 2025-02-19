@@ -140,26 +140,26 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     setErrors({});
 
-    
-  
+
+
     let newErrors = {};
     Object.keys(formData).forEach((key) => {
       if (!formData[key] || formData[key] === false) {
         newErrors[key] = "Information is missing";
       }
     });
-  
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       toast.error("Please fill out all required fields correctly.");
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       const response = await api.post("authentication/register", formData);
       toast.success("Successfully created a new account!");
@@ -171,7 +171,7 @@ const RegisterPage = () => {
       console.log(err.response?.data);
     }
   };
-  
+
 
 
   const getStrengthColor = () => {
@@ -224,7 +224,7 @@ const RegisterPage = () => {
             >
               Register Another Account
             </button>
-            
+
           </div>
         ) : (
           <>
@@ -236,7 +236,7 @@ const RegisterPage = () => {
                 Join us today to ensure your family medical health!
               </p>
             </div>
-            
+
 
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               {/* Username */}
@@ -258,7 +258,7 @@ const RegisterPage = () => {
                       } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     placeholder="username123"
                   />
-                  
+
                 </div>
                 {errors.username && (
                   <p className="mt-2 text-sm text-red-600">{errors.username}</p>
@@ -285,19 +285,19 @@ const RegisterPage = () => {
                     placeholder="••••••••"
                   />
                   <button
-  type="button"
-  className="absolute inset-y-0 right-0 pr-3 flex items-center z-10"
-  onClick={(e) => {
-    e.preventDefault(); // Ngăn sự kiện không mong muốn
-    setShowPassword(!showPassword);
-  }}
->
-  {showPassword ? (
-    <FaEyeSlash className="h-5 w-5 text-gray-500 cursor-pointer" />
-  ) : (
-    <FaEye className="h-5 w-5 text-gray-500 cursor-pointer" />
-  )}
-</button>
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center z-10"
+                    onClick={(e) => {
+                      e.preventDefault(); // Ngăn sự kiện không mong muốn
+                      setShowPassword(!showPassword);
+                    }}
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="h-5 w-5 text-gray-500 cursor-pointer" />
+                    ) : (
+                      <FaEye className="h-5 w-5 text-gray-500 cursor-pointer" />
+                    )}
+                  </button>
                 </div>
                 {errors.password && (
                   <p className="mt-2 text-sm text-red-600">{errors.password}</p>
@@ -336,7 +336,7 @@ const RegisterPage = () => {
                         } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="John Doe"
                     />
-                    
+
                   </div>
                   {errors.name && (
                     <p className="mt-2 text-sm text-red-600">{errors.name}</p>
@@ -362,7 +362,7 @@ const RegisterPage = () => {
                         } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="you@example.com"
                     />
-                    
+
                   </div>
                   {errors.email && (
                     <p className="mt-2 text-sm text-red-600">{errors.email}</p>
@@ -388,7 +388,7 @@ const RegisterPage = () => {
                         } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="123-456-7890"
                     />
-                    
+
                   </div>
                   {errors.phone && (
                     <p className="mt-2 text-sm text-red-600">{errors.phone}</p>
@@ -414,7 +414,7 @@ const RegisterPage = () => {
                         } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="123 Main St, City, Country"
                     />
-                    
+
                   </div>
                   {errors.address && (
                     <p className="mt-2 text-sm text-red-600">
@@ -487,7 +487,7 @@ const RegisterPage = () => {
                       className={`appearance-none block w-full px-3 py-2 border ${errors.dob ? "border-red-300" : "border-gray-300"
                         } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     />
-                    
+
                   </div>
                   {errors.dob && (
                     <p className="mt-2 text-sm text-red-600">{errors.dob}</p>
