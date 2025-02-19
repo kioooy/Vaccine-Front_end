@@ -4,7 +4,6 @@ import {
   FaEye,
   FaEyeSlash,
   FaCheckCircle,
-  FaTimesCircle,
   FaGoogle,
 } from "react-icons/fa";
 import { auth } from "../../config/firebase";
@@ -62,7 +61,7 @@ const RegisterPage = () => {
     switch (name) {
       case "name":
         if (!value) newErrors.name = "Full name is required";
-        else if (!/^[A-Za-z\s]+$/.test(value))
+        else if (!/^[A-Za-zÀ-ỹ\s]+$/.test(value))
           newErrors.name = "Only alphabets and spaces allowed";
         else delete newErrors.name;
         break;
@@ -141,16 +140,39 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    setErrors({});
 
+    
+  
+    let newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      if (!formData[key] || formData[key] === false) {
+        newErrors[key] = "Information is missing";
+      }
+    });
+  
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fill out all required fields correctly.");
+      return;
+    }
+  
+    setIsLoading(true);
+  
     try {
       const response = await api.post("authentication/register", formData);
       toast.success("Successfully created a new account!");
       navigate("/login");
     } catch (err) {
-      toast.error(err.response.data);
-      console.log(err.response.data);
+      setIsLoading(false); // Đảm bảo dừng trạng thái loading khi có lỗi
+      setErrors(err.response?.data || {});
+      toast.error("Registration failed! Please check the highlighted fields.");
+      console.log(err.response?.data);
     }
   };
+  
+
 
   const getStrengthColor = () => {
     switch (passwordStrength) {
@@ -202,6 +224,7 @@ const RegisterPage = () => {
             >
               Register Another Account
             </button>
+            
           </div>
         ) : (
           <>
@@ -213,6 +236,7 @@ const RegisterPage = () => {
                 Join us today to ensure your family medical health!
               </p>
             </div>
+            
 
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               {/* Username */}
@@ -230,16 +254,11 @@ const RegisterPage = () => {
                     type="text"
                     value={formData.username}
                     onChange={handleChange}
-                    className={`appearance-none block w-full px-3 py-2 border ${
-                      errors.username ? "border-red-300" : "border-gray-300"
-                    } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                    className={`appearance-none block w-full px-3 py-2 border ${errors.username ? "border-red-300" : "border-gray-300"
+                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     placeholder="username123"
                   />
-                  {errors.username && (
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <FaTimesCircle className="h-5 w-5 text-red-500" />
-                    </div>
-                  )}
+                  
                 </div>
                 {errors.username && (
                   <p className="mt-2 text-sm text-red-600">{errors.username}</p>
@@ -261,22 +280,24 @@ const RegisterPage = () => {
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
-                    className={`appearance-none block w-full px-3 py-2 border ${
-                      errors.password ? "border-red-300" : "border-gray-300"
-                    } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm pr-10`}
+                    className={`appearance-none block w-full px-3 py-2 border ${errors.password ? "border-red-300" : "border-gray-300"
+                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm pr-10`}
                     placeholder="••••••••"
                   />
                   <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <FaEyeSlash className="h-5 w-5 text-gray-400" />
-                    ) : (
-                      <FaEye className="h-5 w-5 text-gray-400" />
-                    )}
-                  </button>
+  type="button"
+  className="absolute inset-y-0 right-0 pr-3 flex items-center z-10"
+  onClick={(e) => {
+    e.preventDefault(); // Ngăn sự kiện không mong muốn
+    setShowPassword(!showPassword);
+  }}
+>
+  {showPassword ? (
+    <FaEyeSlash className="h-5 w-5 text-gray-500 cursor-pointer" />
+  ) : (
+    <FaEye className="h-5 w-5 text-gray-500 cursor-pointer" />
+  )}
+</button>
                 </div>
                 {errors.password && (
                   <p className="mt-2 text-sm text-red-600">{errors.password}</p>
@@ -311,16 +332,11 @@ const RegisterPage = () => {
                       type="text"
                       value={formData.name}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.name ? "border-red-300" : "border-gray-300"
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${errors.name ? "border-red-300" : "border-gray-300"
+                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="John Doe"
                     />
-                    {errors.name && (
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <FaTimesCircle className="h-5 w-5 text-red-500" />
-                      </div>
-                    )}
+                    
                   </div>
                   {errors.name && (
                     <p className="mt-2 text-sm text-red-600">{errors.name}</p>
@@ -342,16 +358,11 @@ const RegisterPage = () => {
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.email ? "border-red-300" : "border-gray-300"
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${errors.email ? "border-red-300" : "border-gray-300"
+                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="you@example.com"
                     />
-                    {errors.email && (
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <FaTimesCircle className="h-5 w-5 text-red-500" />
-                      </div>
-                    )}
+                    
                   </div>
                   {errors.email && (
                     <p className="mt-2 text-sm text-red-600">{errors.email}</p>
@@ -373,16 +384,11 @@ const RegisterPage = () => {
                       type="text"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.phone ? "border-red-300" : "border-gray-300"
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${errors.phone ? "border-red-300" : "border-gray-300"
+                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="123-456-7890"
                     />
-                    {errors.phone && (
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <FaTimesCircle className="h-5 w-5 text-red-500" />
-                      </div>
-                    )}
+                    
                   </div>
                   {errors.phone && (
                     <p className="mt-2 text-sm text-red-600">{errors.phone}</p>
@@ -404,16 +410,11 @@ const RegisterPage = () => {
                       type="text"
                       value={formData.address}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.address ? "border-red-300" : "border-gray-300"
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${errors.address ? "border-red-300" : "border-gray-300"
+                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="123 Main St, City, Country"
                     />
-                    {errors.address && (
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <FaTimesCircle className="h-5 w-5 text-red-500" />
-                      </div>
-                    )}
+                    
                   </div>
                   {errors.address && (
                     <p className="mt-2 text-sm text-red-600">
@@ -483,15 +484,10 @@ const RegisterPage = () => {
                       type="date"
                       value={formData.dob}
                       onChange={handleChange}
-                      className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.dob ? "border-red-300" : "border-gray-300"
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`appearance-none block w-full px-3 py-2 border ${errors.dob ? "border-red-300" : "border-gray-300"
+                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     />
-                    {errors.dob && (
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <FaTimesCircle className="h-5 w-5 text-red-500" />
-                      </div>
-                    )}
+                    
                   </div>
                   {errors.dob && (
                     <p className="mt-2 text-sm text-red-600">{errors.dob}</p>
@@ -529,12 +525,8 @@ const RegisterPage = () => {
               <div>
                 <button
                   type="submit"
-                  disabled={isLoading || Object.keys(errors).length > 0}
-                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-                    isLoading || Object.keys(errors).length > 0
-                      ? "bg-indigo-400 cursor-not-allowed"
-                      : "bg-indigo-600 hover:bg-indigo-700"
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                 >
                   {isLoading ? (
                     <svg
@@ -561,6 +553,8 @@ const RegisterPage = () => {
                     "Register"
                   )}
                 </button>
+
+
               </div>
 
               <div className="flex items-center justify-center">
