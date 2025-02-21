@@ -54,6 +54,7 @@ const LoginPage = () => {
 
         localStorage.setItem("token", token);
         toast.success("Successfully login!");
+        navigate("/adminLayouts")
 
         setTimeout(() => {
           if (role === "ADMIN") {

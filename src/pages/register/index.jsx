@@ -1,5 +1,5 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FaEye,
   FaEyeSlash,
@@ -30,6 +30,16 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const fieldRefs = useRef({});
+
+
+  useEffect(() => {
+    Object.keys(errors).forEach((key) => {
+      if (errors[key] && fieldRefs.current[key]) {
+        fieldRefs.current[key].scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+  }, [errors]);
 
   const validatePassword = (password) => {
     let strength = 0;
@@ -159,16 +169,17 @@ const RegisterPage = () => {
     }
 
     setIsLoading(true);
-
     try {
-      const response = await api.post("authentication/register", formData);
-      toast.success("Successfully created a new account!");
-      navigate("/login");
+      await api.post("authentication/register", formData);
+      toast.success("Successfully created a new account! Please verify your email.");
+      navigate("/verify-email?email=" + encodeURIComponent(formData.email));
     } catch (err) {
-      setIsLoading(false); // Đảm bảo dừng trạng thái loading khi có lỗi
-      setErrors(err.response?.data || {});
-      toast.error("Registration failed! Please check the highlighted fields.");
-      console.log(err.response?.data);
+      setIsLoading(false);
+      if (err.response?.data) {
+        setErrors(err.response.data);
+      } else {
+        toast.error("Registration failed! Please try again.");
+      }
     }
   };
 
