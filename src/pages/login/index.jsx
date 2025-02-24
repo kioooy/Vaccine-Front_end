@@ -50,11 +50,11 @@ const LoginPage = () => {
         if (!response || !response.data) {
           throw new Error("Invalid response from server");
         }
-        const { token, role } = response.data; // Không cần response.data.data
+        const { token, role } = response.data;
 
         localStorage.setItem("token", token);
         toast.success("Successfully login!");
-
+        
         setTimeout(() => {
           if (role === "ADMIN") {
             navigate("/dashboard");
@@ -64,7 +64,7 @@ const LoginPage = () => {
         }, 1500);
       } catch (err) {
         console.error("Login error:", err);
-        toast.error(err.response?.data?.message || "Login failed");
+        toast.error(err.response?.data?.message || "Wrong Username or Password");
       } finally {
         setIsLoading(false);
       }
