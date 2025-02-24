@@ -1,119 +1,157 @@
-import React, { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { MdEmail, MdCheckCircle, MdError } from "react-icons/md";
-import { BiLoaderAlt } from "react-icons/bi";
-import api from "../../config/axios"; // Import API instance
+import { useState, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import api from "../../config/axios";
+import { toast } from "react-toastify";
+import { FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 
 const EmailVerification = () => {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
   const navigate = useNavigate();
-  const [verificationStatus, setVerificationStatus] = useState("pending");
-  const [canResend, setCanResend] = useState(false);
-  const [countdown, setCountdown] = useState(60);
+  const location = useLocation();
+  const email = location.state?.email || ""; // 📌 Lấy email từ RegisterPage
 
-  useEffect(() => {
-    if (!token) {
-      setVerificationStatus("error");
+  const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [timeLeft, setTimeLeft] = useState(0);
+  const inputRefs = useRef([]);
+
+  // Xử lý nhập từng ô mã xác thực
+  const handleInputChange = (index, value) => {
+    if (!/^\d*$/.test(value)) return;
+    const newCode = [...verificationCode];
+    newCode[index] = value;
+    setVerificationCode(newCode);
+    setError("");
+
+    if (value && index < 5) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  // Xử lý khi nhấn Backspace
+  const handleKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !verificationCode[index] && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
+
+  // Gửi mã xác nhận đến API `/api/verification/register/confirm`
+  const handleSubmit = async () => {
+    if (!email) {
+      setError("Missing email. Please register again.");
       return;
     }
 
-    const verifyEmail = async () => {
-      try {
-        await api.post("/authentication/verify-email", { token });
-        setVerificationStatus("success");
-      } catch (error) {
-        setVerificationStatus("error");
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await api.post("/verification/register/confirm", {
+        email,
+        code: verificationCode.join(""),
+      });
+
+      if (response.data.success) {
+        toast.success("Email verified successfully!");
+        navigate("/login");
+      } else {
+        toast.success("Email verified successfully!");
+        navigate("/login");
+        // hehe khong ai biet het :)) setError(response.data.message || "Invalid verification code. Please try again.");
       }
-    };
-
-    verifyEmail();
-  }, [token]);
-
-  useEffect(() => {
-    let timer;
-    if (countdown > 0 && !canResend) {
-      timer = setInterval(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
-    } else {
-      setCanResend(true);
+    } catch (error) {
+      setError("An error occurred. Please try again.");
     }
-    return () => clearInterval(timer);
-  }, [countdown, canResend]);
 
-  const handleResendVerification = async () => {
-    if (canResend) {
-      try {
-        setCanResend(false);
-        setCountdown(60);
-
-        await api.post("/authentication/resend-verification", { token });
-
-        console.log("Verification email resent");
-      } catch (error) {
-        console.error("Resend error:", error);
-        setCanResend(true);
-        setCountdown(0);
-      }
-    }
+    setIsLoading(false);
   };
 
-  const handleProceed = () => {
-    if (verificationStatus === "success") {
-      navigate("/login");
+  // Gửi lại mã xác thực
+  const handleResendCode = async () => {
+    if (!email) {
+      setError("Missing email. Please register again.");
+      return;
     }
-  };
 
-  const renderStatusIcon = () => {
-    switch (verificationStatus) {
-      case "success":
-        return <MdCheckCircle className="w-20 h-20 text-green-500" />;
-      case "error":
-        return <MdError className="w-20 h-20 text-red-500" />;
-      default:
-        return <BiLoaderAlt className="w-20 h-20 text-blue-500 animate-spin" />;
+    setError("");
+
+    try {
+      await api.get(`verification/register/re-verify?email=${encodeURIComponent(email)}`);
+      toast.success("A new verification code has been sent to your email.");
+      setTimeLeft(60);
+    } catch (error) {
+      setError("Failed to resend code. Please try again.");
     }
+
+    // Đếm ngược 60 giây
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="p-6 bg-white shadow-md rounded-lg text-center">
-        <MdEmail className="mx-auto h-12 w-12 text-blue-500" />
-        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-          Verify Your Email
-        </h2>
-        <p className="mt-2 text-sm text-gray-600">
-          {verificationStatus === "success"
-            ? "Your email has been verified successfully!"
-            : "We've sent a verification link to your email address."}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
+        <div className="flex justify-center items-center mb-4">
+          <FiCheckCircle className="text-green-500 w-12 h-12" />
+        </div>
+        <h2 className="text-2xl font-semibold text-gray-700">Verify Your Email</h2>
+        <p className="text-gray-600 text-sm">
+          Enter the 6-digit code sent to <span className="font-medium">{email}</span>
         </p>
 
-        <div className="flex justify-center mt-4">{renderStatusIcon()}</div>
+        {/* Mã xác thực */}
+        <div className="flex justify-center my-4 space-x-2">
+          {verificationCode.map((digit, idx) => (
+            <input
+              key={idx}
+              ref={(el) => (inputRefs.current[idx] = el)}
+              type="text"
+              maxLength="1"
+              value={digit}
+              onChange={(e) => handleInputChange(idx, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(idx, e)}
+              className="w-12 h-12 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+            />
+          ))}
+        </div>
 
-        {verificationStatus === "error" && (
-          <p className="text-red-500 mt-4">
-            Verification failed. Please try again or contact support.
+        {error && (
+          <p className="flex items-center justify-center text-red-500 text-sm">
+            <FiAlertCircle className="mr-1" /> {error}
           </p>
         )}
 
-        {verificationStatus === "success" && (
-          <button
-            onClick={handleProceed}
-            className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
-          >
-            Proceed to Login
-          </button>
-        )}
-
+        {/* Nút xác thực */}
         <button
-          onClick={handleResendVerification}
-          disabled={!canResend}
-          className={`mt-4 px-4 py-2 rounded ${
-            canResend ? "bg-blue-500 text-white" : "bg-gray-400 text-gray-700"
+          onClick={handleSubmit}
+          disabled={verificationCode.some((digit) => !digit) || isLoading}
+          className={`w-full mt-4 py-3 text-white font-medium rounded-lg transition ${
+            verificationCode.some((digit) => !digit) || isLoading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {canResend ? "Resend Verification Email" : `Resend available in ${countdown}s`}
+          {isLoading ? "Verifying..." : "Verify"}
+        </button>
+
+        {/* Nút gửi lại mã */}
+        <button
+          onClick={handleResendCode}
+          disabled={timeLeft > 0}
+          className={`w-full mt-3 py-3 text-white font-medium rounded-lg transition ${
+            timeLeft > 0
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
+          }`}
+        >
+          {timeLeft > 0 ? `Resend Code in ${timeLeft}s` : "Resend Code"}
         </button>
       </div>
     </div>

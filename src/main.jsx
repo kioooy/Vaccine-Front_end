@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import StudentManagement from "./UserManagement.jsx";
 import "./index.css";
 import { createBrowserRouter } from "react-router-dom";
 import { RouterProvider } from "react-router";
@@ -11,6 +10,8 @@ import AdminLayout from "./components/layouts/adminLayouts.jsx";
 import VerifyEmailPage from "./pages/verify-email/index.jsx";
 import EmailVerification from "./pages/verify-email/index.jsx";
 import ChildProfileCreation from "./pages/AddChildProfile/index.jsx";
+import UserInformation from "./pages/userinformation/index.jsx";
+import HomePage from "./pages/homepage/index.jsx";
 
 // document.getElementById('root')
 // 1. Tìm tới root
@@ -19,7 +20,7 @@ import ChildProfileCreation from "./pages/AddChildProfile/index.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LoginPage />,
+    element: <HomePage />,
   },
   {
     path: "/login",
@@ -41,6 +42,11 @@ const router = createBrowserRouter([
     path: "/childprofile",
     element: <ChildProfileCreation />,
   },
+  {
+    path: "/userprofile",
+    element: <UserInformation />,
+  },
+ 
 ]);
 
 createRoot(document.getElementById("root")).render(

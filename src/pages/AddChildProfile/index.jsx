@@ -160,7 +160,13 @@ const ChildProfileCreation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+    
+    <div className="min-h-screen bg-gradient-to-br from-blue-500/20 to-purple-500/30 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center"
+    style={{
+      backgroundImage: `url(https://images.unsplash.com/photo-1576495199011-eb94736d05d6)`,
+      backgroundSize: "cover",
+      backgroundBlendMode: "overlay"
+    }}>
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
         <div className="text-center mb-8">
           <FaChild className="mx-auto h-12 w-12 text-blue-500" />
