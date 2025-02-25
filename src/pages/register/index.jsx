@@ -53,6 +53,7 @@ const RegisterPage = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+  
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -164,9 +165,15 @@ const RegisterPage = () => {
       return;
     }
 
+    const { terms, ...dataToSend } = {
+      ...formData,
+    };
+  
+    console.log(dataToSend);
+  
     setIsLoading(true);
     try {
-      await api.post("authentication/register", formData);
+      await api.post("authentication/register", dataToSend);
       await api.get(`verification/register/verify?email=${encodeURIComponent(formData.email)}`);
   
       toast.success("Successfully created a new account! Please verify your email.");

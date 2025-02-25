@@ -15,8 +15,8 @@ const Homepage = () => {
       <header className="bg-yellow-400 py-4 px-8 flex justify-between items-center shadow-lg">
         <h1 className="text-xl font-bold text-blue-800">VACCINE CITY</h1>
         <div>
-          <button onClick={() => navigate("/login")} className="bg-blue-600 text-white px-4 py-2 rounded mr-2 cursor-pointer hover:bg-blue-700 transition duration-300">Đăng ký</button>
-          <button onClick={() => navigate("/register")} className="bg-blue-800 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-900 transition duration-300">Đăng nhập</button>
+          <button onClick={() => navigate("/login")} className="bg-blue-600 text-white px-4 py-2 rounded mr-2 cursor-pointer hover:bg-blue-700 transition duration-300">Đăng nhập</button>
+          <button onClick={() => navigate("/register")} className="bg-blue-800 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-900 transition duration-300">Đăng ký</button>
         </div>
       </header>
 
