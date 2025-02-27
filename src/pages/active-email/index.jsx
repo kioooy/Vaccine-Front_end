@@ -4,11 +4,12 @@ import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 
-const EmailVerification = () => {
+const EmailActive = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email || ""; // 📌 Lấy email từ RegisterPage
 
+  // Thêm state để nhập email
+  const [email, setEmail] = useState(location.state?.email || "");
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -68,21 +69,36 @@ const EmailVerification = () => {
 
   // Gửi lại mã xác thực
   const handleResendCode = async () => {
-    if (!email) {
-      setError("Missing email. Please register again.");
+    if (!email.trim()) {
+      setError("Please enter a valid email.");
       return;
     }
-
+  
     setError("");
-
+  
     try {
-      setTimeLeft(60);
+      // Gửi yêu cầu resend code
       await api.get(`verification/register/re-verify?email=${encodeURIComponent(email)}`);
+      setTimeLeft(60);
+
       toast.success("A new verification code has been sent to your email.");
-      
+  
+      // Nếu gửi thành công, mới đặt cooldown 60 giây
+  
+      // Đếm ngược 60 giây
+      const timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } catch (error) {
       setError("Failed to resend code. Please try again.");
     }
+  
 
     // Đếm ngược 60 giây
     const timer = setInterval(() => {
@@ -103,9 +119,18 @@ const EmailVerification = () => {
           <FiCheckCircle className="text-green-500 w-12 h-12" />
         </div>
         <h2 className="text-2xl font-semibold text-gray-700">Verify Your Email</h2>
-        <p className="text-gray-600 text-sm">
-          Enter the 6-digit code sent to <span className="font-medium">{email}</span>
-        </p>
+
+        {/* Ô nhập email */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter your email"
+          />
+        </div>
 
         {/* Mã xác thực */}
         <div className="flex justify-center my-4 space-x-2">
@@ -159,4 +184,4 @@ const EmailVerification = () => {
   );
 };
 
-export default EmailVerification;
+export default EmailActive;

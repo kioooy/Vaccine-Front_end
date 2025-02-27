@@ -251,6 +251,16 @@ const LoginPage = () => {
                 Register here
               </a>
             </p>
+            
+            <p className="mt-4 text-center text-sm text-gray-600">
+              Not actived yet?{" "}
+              <a
+                href="/active"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Active here
+              </a>
+            </p>
           </div>
 
           <div className="relative">

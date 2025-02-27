@@ -12,6 +12,7 @@ import EmailVerification from "./pages/verify-email/index.jsx";
 import ChildProfileCreation from "./pages/AddChildProfile/index.jsx";
 import UserInformation from "./pages/userinformation/index.jsx";
 import HomePage from "./pages/homepage/index.jsx";
+import EmailActive from "./pages/active-email/index.jsx";
 
 // document.getElementById('root')
 // 1. Tìm tới root
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
   {
     path: "/userprofile",
     element: <UserInformation />,
+  },
+  {
+    path: "/active",
+    element: <EmailActive />,
   },
  
 ]);

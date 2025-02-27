@@ -53,7 +53,7 @@ const RegisterPage = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-  
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -86,7 +86,7 @@ const RegisterPage = () => {
 
       case "phone":
         if (!value) newErrors.phone = "Phone number is required";
-        else if (!/^[0-9]{10,15}$/.test(value))
+        else if (!/^[0-9]{1,10}$/.test(value))
           newErrors.phone = "Invalid phone number format";
         else delete newErrors.phone;
         break;
@@ -99,11 +99,29 @@ const RegisterPage = () => {
         break;
 
       case "dob":
-        if (!value) newErrors.dob = "Date of birth is required";
-        else if (new Date(value) > new Date())
-          newErrors.dob = "Invalid date of birth";
-        else delete newErrors.dob;
+        if (!value) {
+          newErrors.dob = "Date of birth is required";
+        } else {
+          const birthDate = new Date(value);
+          const today = new Date();
+          const age = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          const dayDiff = today.getDate() - birthDate.getDate();
+
+          // Nếu ngày sinh lớn hơn ngày hiện tại
+          if (birthDate > today) {
+            newErrors.dob = "Invalid date of birth";
+          }
+          // Nếu chưa đủ 18 tuổi
+          else if (age < 18 || (age === 18 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
+            newErrors.dob = "You must be at least 18 years old to register";
+          }
+          else {
+            delete newErrors.dob;
+          }
+        }
         break;
+
 
       case "username":
         if (!value) newErrors.username = "Username is required";
@@ -168,22 +186,42 @@ const RegisterPage = () => {
     const { terms, ...dataToSend } = {
       ...formData,
     };
-  
-    console.log(dataToSend);
-  
+
+    //console.log(dataToSend);
+
     setIsLoading(true);
     try {
       await api.post("authentication/register", dataToSend);
       await api.get(`verification/register/verify?email=${encodeURIComponent(formData.email)}`);
-  
+
       toast.success("Successfully created a new account! Please verify your email.");
-      
+
       // Chuyển hướng kèm email
       navigate("/verify", { state: { email: formData.email } });
     } catch (err) {
       setIsLoading(false);
-      toast.error(err.response?.data?.message || "Registration failed. Please try again.");
+
+      // Kiểm tra nếu backend trả về lỗi có trong err.response.data
+      const errorMessage = err.response?.data;
+
+      if (typeof errorMessage === "string") {
+        // Hiển thị lỗi trực tiếp từ backend (ví dụ: "You must be at least 18 years old to register")
+        toast.error(errorMessage);
+      } else if (typeof errorMessage === "object") {
+        // Nếu backend trả về nhiều lỗi dưới dạng object
+        Object.keys(errorMessage).forEach((key) => {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            [key]: errorMessage[key],
+          }));
+        });
+      } else {
+        toast.error("Registration failed. Please try again.");
+      }
+
+      console.log(err.response.data);
     }
+
   };
 
 
@@ -401,7 +439,7 @@ const RegisterPage = () => {
                       onChange={handleChange}
                       className={`appearance-none block w-full px-3 py-2 border ${errors.phone ? "border-red-300" : "border-gray-300"
                         } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                      placeholder="123-456-7890"
+                      placeholder="(+84)"
                     />
 
                   </div>
@@ -484,7 +522,7 @@ const RegisterPage = () => {
                   )}
                 </div>
 
-                 {/* Date of Birth */}
+                {/* Date of Birth */}
                 <div>
                   <label
                     htmlFor="dob"
@@ -499,9 +537,12 @@ const RegisterPage = () => {
                       type="date"
                       value={formData.dob}
                       onChange={handleChange}
+                      min="1900-01-01" // Không cho phép năm nhỏ hơn 1900
+                      max={new Date().toISOString().split("T")[0]} // Không cho phép ngày lớn hơn hôm nay
                       className={`appearance-none block w-full px-3 py-2 border ${errors.dob ? "border-red-300" : "border-gray-300"
                         } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     />
+
 
                   </div>
                   {errors.dob && (
