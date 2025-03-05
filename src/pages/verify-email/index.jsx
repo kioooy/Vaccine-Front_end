@@ -76,8 +76,9 @@ const EmailVerification = () => {
     setError("");
 
     try {
-      setTimeLeft(60);
+      
       await api.get(`verification/register/re-verify?email=${encodeURIComponent(email)}`);
+      setTimeLeft(60);
       toast.success("A new verification code has been sent to your email.");
       
     } catch (error) {

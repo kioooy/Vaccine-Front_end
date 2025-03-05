@@ -4,6 +4,8 @@ import { FcGoogle } from "react-icons/fc";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/features/userSlice";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +18,10 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  //update data ==> useDispatch
+  //get data ==> useSelector
   const validateForm = () => {
     const newErrors = {};
     if (!formData.username.trim()) {
@@ -54,6 +59,8 @@ const LoginPage = () => {
 
         localStorage.setItem("token", token);
         toast.success("Successfully login!");
+        console.log(response.data.data)
+        dispatch(login(response.data.data))
         
         setTimeout(() => {
           if (role === "ADMIN") {

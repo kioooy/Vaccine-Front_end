@@ -5,7 +5,6 @@ import { RouterProvider } from "react-router";
 import LoginPage from "./pages/login/index.jsx";
 import RegisterPage from "./pages/register/index.jsx";
 import { ToastContainer } from "react-toastify";
-import UserManagement from "./UserManagement.jsx";
 import AdminLayout from "./components/layouts/adminLayouts.jsx";
 import VerifyEmailPage from "./pages/verify-email/index.jsx";
 import EmailVerification from "./pages/verify-email/index.jsx";
@@ -13,6 +12,12 @@ import ChildProfileCreation from "./pages/AddChildProfile/index.jsx";
 import UserInformation from "./pages/userinformation/index.jsx";
 import HomePage from "./pages/homepage/index.jsx";
 import EmailActive from "./pages/active-email/index.jsx";
+import ManageProduct from "./pages/admin/manage-product.jsx";
+import ManageUser from "./pages/admin/manage-user.jsx";
+import { Provider } from "react-redux";
+import { persistor, store } from "./redux/store.js";
+import { PersistGate } from "redux-persist/integration/react";
+
 
 // document.getElementById('root')
 // 1. Tìm tới root
@@ -31,10 +36,6 @@ const router = createBrowserRouter([
     path: "/register",
     element: <RegisterPage />,
   },
-   {
-    path: "/dashboard",
-    element: <AdminLayout />,
-  },
   {
     path: "/verify",
     element: <EmailVerification />,
@@ -51,14 +52,30 @@ const router = createBrowserRouter([
     path: "/active",
     element: <EmailActive />,
   },
+  {
+    path: "/dashboard",
+    element: <AdminLayout />,
+    children: [
+      {
+        path: "/dashboard/product",
+        element: <ManageProduct />,
+      },
+      {
+        path: "/dashboard/user",
+        element: <ManageUser />,
+      },
+    ],
+  },
  
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <>
-    <RouterProvider router={router} />
-    <ToastContainer/>
-  </>
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </PersistGate>
+  </Provider>
 );
 
 // Single Page Application
